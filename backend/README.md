@@ -19,7 +19,7 @@
 
 ## DB
 
-![demo](demo.png)
+![db](db.png)
 ### connect by tool (MySQLWorkbench)
 - `user: root & pw: secret`
 ### migration
