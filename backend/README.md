@@ -16,3 +16,15 @@
 2. By Laravel artisan
 - `backend % php artisan serve`
 - in browser accesss to "localhost:8000"
+
+## DB
+
+### connect by tool (MySQLWorkbench)
+- `user: phper & pw: secret`
+### migration
+- `php artisan migrate`
+
+## MVC
+
+- `php artisan make:model Upcoming -m`
+
