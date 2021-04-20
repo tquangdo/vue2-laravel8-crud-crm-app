@@ -20,11 +20,14 @@
 ## DB
 
 ### connect by tool (MySQLWorkbench)
-- `user: phper & pw: secret`
+- `user: root & pw: secret`
 ### migration
 - `php artisan migrate`
 
 ## MVC
 
-- `php artisan make:model Upcoming -m`
-
+- `php artisan make:model Upcoming/Today -m`
+>KO can `php artisan make:migration create_upcomings/todays_table`
+- `php artisan make:seeder UpcomingSeeder/TodaySeeder`
+- `php artisan db:seed --class=UpcomingSeeder/TodaySeeder`
+- `php artisan make:resource UpcomingResource/TodayTaskResource`

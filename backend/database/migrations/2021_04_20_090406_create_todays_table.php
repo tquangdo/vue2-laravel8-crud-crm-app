@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUpcomingsTable extends Migration
+class CreateTodaysTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateUpcomingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('upcomings', function (Blueprint $table) {
+        Schema::create('todays', function (Blueprint $table) {
             $table->id();
             $table->string("title");
             $table->boolean("done")->default(false);
             $table->boolean("approved")->default(false);
-            $table->boolean("waiting")->default(false);
             $table->string("taskId");
             $table->timestamps();
         });
@@ -31,6 +30,6 @@ class CreateUpcomingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('upcomings');
+        Schema::dropIfExists('todays');
     }
 }
