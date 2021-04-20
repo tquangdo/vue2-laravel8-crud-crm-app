@@ -2037,12 +2037,119 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
-    return {};
+    return {
+      v_todaytasks: [],
+      v_upcomings: [],
+      v_newtask: ""
+    };
   },
-  created: function created() {},
-  methods: {}
+  created: function created() {
+    this.onFetchTodayTasks();
+    this.onFetchUpcoming();
+  },
+  methods: {
+    onFetchUpcoming: function onFetchUpcoming() {
+      var _this = this;
+
+      fetch("/api/upcoming").then(function (res) {
+        return res.json();
+      }).then(function (_ref) {
+        var data = _ref.data;
+        _this.v_upcomings = data;
+      })["catch"](function (err) {
+        return alert("SEL upcoming tasks ERR!!! " + err);
+      });
+    },
+    onAddUpcomingTask: function onAddUpcomingTask(e) {
+      var _this2 = this;
+
+      e.preventDefault();
+
+      if (this.v_upcomings.length > 4) {
+        alert("Please complete the upcoming task!!!");
+      } else {
+        var constNewTask = {
+          title: this.v_newtask,
+          waiting: true,
+          taskId: Math.random().toString(36).substring(7)
+        };
+        fetch("/api/upcoming", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json"
+          },
+          body: JSON.stringify(constNewTask)
+        }).then(function () {
+          return _this2.v_upcomings.push(constNewTask);
+        });
+        this.v_newtask = "";
+      }
+    },
+    onFetchTodayTasks: function onFetchTodayTasks() {},
+    onDelUpcoming: function onDelUpcoming(arg_task_id) {
+      var _this3 = this;
+
+      if (confirm("Are you sure?")) {
+        fetch("/api/upcoming/".concat(arg_task_id), {
+          method: "DELETE"
+        }).then(function (res) {
+          return res.json();
+        }).then(function () {
+          _this3.v_upcomings = _this3.v_upcomings.filter(function (_ref2) {
+            var id = _ref2.taskId;
+            return id !== arg_task_id;
+          });
+        })["catch"](function (err) {
+          return alert("DEL upcoming tasks ERR!!! " + err);
+        });
+      }
+    }
+  }
 });
 
 /***/ }),
@@ -37981,40 +38088,137 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", { attrs: { id: "right" } }, [
+    _c("h1", [_vm._v("Development CRM")]),
+    _vm._v(" "),
+    _vm._m(0),
+    _vm._v(" "),
+    _c("p", [
+      _vm._v(
+        "\n    Lorem Ipsum is simply dummy text of the printing and typesetting industry.\n    Lorem Ipsum has been the industry's standard dummy text ever since the\n    1500s\n  "
+      )
+    ]),
+    _vm._v(" "),
+    _vm._m(1),
+    _vm._v(" "),
+    _vm._m(2),
+    _vm._v(" "),
+    _c("div", { staticClass: "upcoming" }, [
+      _vm._m(3),
+      _vm._v(" "),
+      _c(
+        "form",
+        { attrs: { action: "" }, on: { submit: _vm.onAddUpcomingTask } },
+        [
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.v_newtask,
+                expression: "v_newtask"
+              }
+            ],
+            attrs: { type: "text" },
+            domProps: { value: _vm.v_newtask },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.v_newtask = $event.target.value
+              }
+            }
+          })
+        ]
+      ),
+      _vm._v(" "),
+      _c(
+        "ul",
+        { staticClass: "tasks-list" },
+        _vm._l(_vm.v_upcomings, function(item_upcoming_task) {
+          return _c("li", { key: item_upcoming_task.id }, [
+            _c("div", { staticClass: "info" }, [
+              _c("div", { staticClass: "left" }, [
+                _c("label", { staticClass: "myCheckbox" }, [
+                  _c("input", {
+                    attrs: { type: "checkbox", name: "test" },
+                    domProps: { checked: item_upcoming_task.done },
+                    on: {
+                      change: function($event) {
+                        return _vm.onCheckUpcoming(item_upcoming_task.taskId)
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("span")
+                ]),
+                _vm._v(" "),
+                _c("h4", [_vm._v(_vm._s(item_upcoming_task.title))])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "right" }, [
+                _c("img", { attrs: { src: "images/edit.png", alt: "" } }),
+                _vm._v(" "),
+                _c("img", {
+                  attrs: { src: "images/del.png", alt: "" },
+                  on: {
+                    click: function($event) {
+                      return _vm.onDelUpcoming(item_upcoming_task.taskId)
+                    }
+                  }
+                })
+              ])
+            ])
+          ])
+        }),
+        0
+      )
+    ])
+  ])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { attrs: { id: "right" } }, [
-      _c("h1", [_vm._v("Development CRM")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "horizontal" }, [
-        _c("img", { attrs: { src: "images/horizontal.png" } })
-      ]),
-      _vm._v(" "),
-      _c("p", [
-        _vm._v(
-          "\n    Lorem Ipsum is simply dummy text of the printing and typesetting industry.\n    Lorem Ipsum has been the industry's standard dummy text ever since the\n    1500s\n  "
-        )
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "users-icon" }, [
-        _c("img", { attrs: { src: "images/users.png" } })
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "tasks" }, [
-        _c("div", { staticClass: "add-tasks" }, [
-          _c("h2", [_vm._v("Today's Task")]),
-          _vm._v(" "),
-          _c("div", { staticClass: "add-action" }, [
-            _c("img", { attrs: { src: "images/add.png" } })
-          ])
-        ]),
+    return _c("div", { staticClass: "horizontal" }, [
+      _c("img", { attrs: { src: "images/horizontal.png" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "users-icon" }, [
+      _c("img", { attrs: { src: "images/users.png" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "tasks" }, [
+      _c("div", { staticClass: "add-tasks" }, [
+        _c("h2", [_vm._v("Today's Task")]),
         _vm._v(" "),
-        _c("ul", { staticClass: "tasks-list" })
+        _c("div", { staticClass: "add-action" }, [
+          _c("img", { attrs: { src: "images/add.png" } })
+        ])
+      ]),
+      _vm._v(" "),
+      _c("ul", { staticClass: "tasks-list" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "add-tasks" }, [
+      _c("h2", [_vm._v("Upcoming")]),
+      _vm._v(" "),
+      _c("div", { staticClass: "add-action" }, [
+        _c("img", { attrs: { src: "images/add.png", alt: "" } })
       ])
     ])
   }
