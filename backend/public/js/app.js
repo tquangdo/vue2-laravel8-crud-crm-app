@@ -2080,74 +2080,142 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
-      v_todaytasks: [],
+      v_dailytasks: [],
       v_upcomings: [],
       v_newtask: ""
     };
   },
   created: function created() {
-    this.onFetchTodayTasks();
+    this.onFetchDailyTasks();
     this.onFetchUpcoming();
   },
   methods: {
-    onFetchUpcoming: function onFetchUpcoming() {
-      var _this = this;
-
-      fetch("/api/upcoming").then(function (res) {
-        return res.json();
-      }).then(function (_ref) {
-        var data = _ref.data;
-        _this.v_upcomings = data;
-      })["catch"](function (err) {
-        return alert("SEL upcoming tasks ERR!!! " + err);
-      });
+    // ~~~~~ upcoming
+    onCheckUpcoming: function onCheckUpcoming(arg_task_id) {
+      if (this.v_dailytasks.length > 4) {
+        alert("Please complete the upcoming task!!!");
+        window.location.href = "/";
+      } else {
+        this.onAddDailyTask(arg_task_id);
+        this.onDelSubFunc(arg_task_id, "upcoming");
+      }
     },
+    //U-1
+    onFetchUpcoming: function onFetchUpcoming() {
+      this.onFetchSubFunc("upcoming");
+    },
+    //U-2
     onAddUpcomingTask: function onAddUpcomingTask(e) {
-      var _this2 = this;
+      var _this = this;
 
       e.preventDefault();
 
-      if (this.v_upcomings.length > 4) {
-        alert("Please complete the upcoming task!!!");
+      if (this.v_newtask.trim().length === 0) {
+        alert("Please input the upcoming task name!!!");
       } else {
-        var constNewTask = {
-          title: this.v_newtask,
-          waiting: true,
-          taskId: Math.random().toString(36).substring(7)
-        };
-        fetch("/api/upcoming", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json"
-          },
-          body: JSON.stringify(constNewTask)
-        }).then(function () {
-          return _this2.v_upcomings.push(constNewTask);
-        });
-        this.v_newtask = "";
+        if (this.v_upcomings.length > 4) {
+          alert("Please complete the upcoming task!!!");
+        } else {
+          var constNewTask = {
+            title: this.v_newtask,
+            waiting: true,
+            taskId: Math.random().toString(36).substring(7)
+          };
+          fetch("/api/upcoming", {
+            method: "POST",
+            headers: {
+              "content-type": "application/json"
+            },
+            body: JSON.stringify(constNewTask)
+          }).then(function () {
+            return _this.v_upcomings.push(constNewTask);
+          });
+          this.v_newtask = "";
+        }
       }
     },
-    onFetchTodayTasks: function onFetchTodayTasks() {},
-    onDelUpcoming: function onDelUpcoming(arg_task_id) {
+    //U-3
+    onDelUpcoming: function onDelUpcoming(arg_task) {
+      if (confirm("Are you sure to delete this task?: " + arg_task.title)) {
+        this.onDelSubFunc(arg_task.taskId, "upcoming");
+      }
+    },
+    // ~~~~~ daily
+    //D-1
+    onFetchDailyTasks: function onFetchDailyTasks() {
+      this.onFetchSubFunc("dailytask");
+    },
+    //D-2
+    onAddDailyTask: function onAddDailyTask(arg_task_id) {
+      var _this2 = this;
+
+      var task_tmp = this.v_upcomings.filter(function (_ref) {
+        var id = _ref.taskId;
+        return id === arg_task_id;
+      })[0];
+      fetch("/api/dailytask", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify(task_tmp)
+      }).then(function () {
+        return _this2.v_dailytasks.unshift(task_tmp);
+      });
+    },
+    //D-3
+    onDeleteDailyTask: function onDeleteDailyTask(arg_task) {
+      if (confirm("Are you sure to delete this task?: " + arg_task.title)) {
+        this.onDelSubFunc(arg_task.taskId, "dailytask");
+      }
+    },
+    onUpdateDailyTask: function onUpdateDailyTask(arg_task_id) {},
+    // ~~~~~ sub function
+    onFetchSubFunc: function onFetchSubFunc(arg_uri_name) {
       var _this3 = this;
 
-      if (confirm("Are you sure?")) {
-        fetch("/api/upcoming/".concat(arg_task_id), {
-          method: "DELETE"
-        }).then(function (res) {
-          return res.json();
-        }).then(function () {
-          _this3.v_upcomings = _this3.v_upcomings.filter(function (_ref2) {
-            var id = _ref2.taskId;
+      fetch("/api/" + arg_uri_name).then(function (res) {
+        return res.json();
+      }).then(function (_ref2) {
+        var data = _ref2.data;
+
+        if (arg_uri_name === "upcoming") {
+          _this3.v_upcomings = data;
+        } else {
+          _this3.v_dailytasks = data;
+        }
+      })["catch"](function (err) {
+        return alert("SEL " + arg_uri_name + " tasks ERR!!! " + err);
+      });
+    },
+    onDelSubFunc: function onDelSubFunc(arg_task_id, arg_uri_name) {
+      var _this4 = this;
+
+      fetch("/api/".concat(arg_uri_name, "/").concat(arg_task_id), {
+        method: "DELETE"
+      }).then(function () {
+        if (arg_uri_name === "upcoming") {
+          _this4.v_upcomings = _this4.v_upcomings.filter(function (_ref3) {
+            var id = _ref3.taskId;
             return id !== arg_task_id;
           });
-        })["catch"](function (err) {
-          return alert("DEL upcoming tasks ERR!!! " + err);
-        });
-      }
+        } else {
+          _this4.v_dailytasks = _this4.v_dailytasks.filter(function (_ref4) {
+            var id = _ref4.taskId;
+            return id !== arg_task_id;
+          });
+        }
+      })["catch"](function (err) {
+        return alert("DEL " + arg_uri_name + " task ERR!!! " + err);
+      });
     }
   }
 });
@@ -38101,10 +38169,82 @@ var render = function() {
     _vm._v(" "),
     _vm._m(1),
     _vm._v(" "),
-    _vm._m(2),
+    _c("div", { staticClass: "tasks" }, [
+      _vm._m(2),
+      _vm._v(" "),
+      _c(
+        "ul",
+        { staticClass: "tasks-list" },
+        _vm._l(_vm.v_dailytasks, function(item_task) {
+          return _c("li", { key: item_task.id }, [
+            _c("div", { staticClass: "info" }, [
+              _c("div", { staticClass: "left" }, [
+                _c("label", { staticClass: "myCheckbox" }, [
+                  _c("input", {
+                    attrs: { type: "checkbox", name: "test" },
+                    domProps: { checked: item_task.done },
+                    on: {
+                      change: function($event) {
+                        return _vm.onUpdateDailyTask(item_task.taskId)
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("span")
+                ]),
+                _vm._v(" "),
+                _c("h4", [_vm._v(_vm._s(item_task.title))])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "right" }, [
+                _c("img", { attrs: { src: "images/edit.png" } }),
+                _vm._v(" "),
+                _c("img", {
+                  attrs: { src: "images/del.png" },
+                  on: {
+                    click: function($event) {
+                      return _vm.onDeleteDailyTask(item_task)
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    class: {
+                      inprogress: !item_task.approved,
+                      approved: item_task.approved
+                    }
+                  },
+                  [
+                    _vm._v(
+                      "\n              " +
+                        _vm._s(
+                          item_task.approved ? "Approved" : "In progress"
+                        ) +
+                        "\n            "
+                    )
+                  ]
+                )
+              ])
+            ])
+          ])
+        }),
+        0
+      )
+    ]),
     _vm._v(" "),
     _c("div", { staticClass: "upcoming" }, [
-      _vm._m(3),
+      _c("div", { staticClass: "add-tasks" }, [
+        _c("h2", [_vm._v("Upcoming")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "add-action" }, [
+          _c("img", {
+            attrs: { src: "images/add.png", alt: "" },
+            on: { click: _vm.onAddUpcomingTask }
+          })
+        ])
+      ]),
       _vm._v(" "),
       _c(
         "form",
@@ -38164,10 +38304,20 @@ var render = function() {
                   attrs: { src: "images/del.png", alt: "" },
                   on: {
                     click: function($event) {
-                      return _vm.onDelUpcoming(item_upcoming_task.taskId)
+                      return _vm.onDelUpcoming(item_upcoming_task)
                     }
                   }
-                })
+                }),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    class: {
+                      waiting: item_upcoming_task.waiting
+                    }
+                  },
+                  [_vm._v("\n              Waiting\n            ")]
+                )
               ])
             ])
           ])
@@ -38198,28 +38348,8 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "tasks" }, [
-      _c("div", { staticClass: "add-tasks" }, [
-        _c("h2", [_vm._v("Today's Task")]),
-        _vm._v(" "),
-        _c("div", { staticClass: "add-action" }, [
-          _c("img", { attrs: { src: "images/add.png" } })
-        ])
-      ]),
-      _vm._v(" "),
-      _c("ul", { staticClass: "tasks-list" })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
     return _c("div", { staticClass: "add-tasks" }, [
-      _c("h2", [_vm._v("Upcoming")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "add-action" }, [
-        _c("img", { attrs: { src: "images/add.png", alt: "" } })
-      ])
+      _c("h2", [_vm._v("Daily's Task")])
     ])
   }
 ]

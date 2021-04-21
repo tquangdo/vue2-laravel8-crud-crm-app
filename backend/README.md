@@ -16,6 +16,7 @@
 2. By Laravel artisan
 - `backend % php artisan serve`
 - in browser accesss to "localhost:8000"
+- => ERR: `SQLSTATE[HY000] [2054] The server requested authentication method unknown to the client (SQL: query)`
 
 ## DB
 

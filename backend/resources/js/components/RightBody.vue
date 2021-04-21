@@ -15,41 +15,39 @@
 
     <div class="tasks">
       <div class="add-tasks">
-        <h2>Today's Task</h2>
-        <div class="add-action"><img src="images/add.png" /></div>
+        <h2>Daily's Task</h2>
       </div>
 
       <ul class="tasks-list">
-        <!-- <li v-for="task in v_todaytasks" v-bind:key="task.id">
+        <li v-for="item_task in v_dailytasks" :key="item_task.id">
           <div class="info">
             <div class="left">
               <label class="myCheckbox">
                 <input
                   type="checkbox"
                   name="test"
-                  :checked="task.completed"
-                  @change="updateTodayTask(task.taskId)"
+                  :checked="item_task.done"
+                  @change="onUpdateDailyTask(item_task.taskId)"
                 />
                 <span></span>
               </label>
 
-              <h4>{{ task.title }}</h4>
+              <h4>{{ item_task.title }}</h4>
             </div>
             <div class="right">
               <img src="images/edit.png" />
-              <img src="images/del.png" @click="deleteTask(task.taskId)" />
-
+              <img src="images/del.png" @click="onDeleteDailyTask(item_task)" />
               <button
-                v-bind:class="{
-                  inprogress: !task.approved,
-                  approved: task.approved,
+                :class="{
+                  inprogress: !item_task.approved,
+                  approved: item_task.approved,
                 }"
               >
-                {{ task.approved ? "Approved" : "In progress" }}
+                {{ item_task.approved ? "Approved" : "In progress" }}
               </button>
             </div>
           </div>
-        </li> -->
+        </li>
       </ul>
     </div>
 
@@ -57,7 +55,7 @@
       <div class="add-tasks">
         <h2>Upcoming</h2>
         <div class="add-action">
-          <img src="images/add.png" alt="" />
+          <img src="images/add.png" alt="" @click="onAddUpcomingTask" />
         </div>
       </div>
 
@@ -88,8 +86,15 @@
               <img
                 src="images/del.png"
                 alt=""
-                @click="onDelUpcoming(item_upcoming_task.taskId)"
+                @click="onDelUpcoming(item_upcoming_task)"
               />
+              <button
+                :class="{
+                  waiting: item_upcoming_task.waiting,
+                }"
+              >
+                Waiting
+              </button>
             </div>
           </div>
         </li>
@@ -102,58 +107,117 @@
 export default {
   data() {
     return {
-      v_todaytasks: [],
+      v_dailytasks: [],
       v_upcomings: [],
       v_newtask: "",
     };
   },
   created() {
-    this.onFetchTodayTasks();
+    this.onFetchDailyTasks();
     this.onFetchUpcoming();
   },
   methods: {
-    onFetchUpcoming() {
-      fetch("/api/upcoming")
-        .then((res) => res.json())
-        .then(({ data }) => {
-          this.v_upcomings = data;
-        })
-        .catch((err) => alert("SEL upcoming tasks ERR!!! " + err));
-    },
-    onAddUpcomingTask(e) {
-      e.preventDefault();
-      if (this.v_upcomings.length > 4) {
+    // ~~~~~ upcoming
+    onCheckUpcoming(arg_task_id) {
+      if (this.v_dailytasks.length > 4) {
         alert("Please complete the upcoming task!!!");
+        window.location.href = "/";
       } else {
-        const constNewTask = {
-          title: this.v_newtask,
-          waiting: true,
-          taskId: Math.random().toString(36).substring(7),
-        };
-        fetch("/api/upcoming", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(constNewTask),
-        }).then(() => this.v_upcomings.push(constNewTask));
-        this.v_newtask = "";
+        this.onAddDailyTask(arg_task_id);
+        this.onDelSubFunc(arg_task_id, "upcoming");
       }
     },
-    onFetchTodayTasks() {},
-    onDelUpcoming(arg_task_id) {
-      if (confirm("Are you sure?")) {
-        fetch(`/api/upcoming/${arg_task_id}`, {
-          method: "DELETE",
+    //U-1
+    onFetchUpcoming() {
+      this.onFetchSubFunc("upcoming");
+    },
+    //U-2
+    onAddUpcomingTask(e) {
+      e.preventDefault();
+      if (this.v_newtask.trim().length === 0) {
+        alert("Please input the upcoming task name!!!");
+      } else {
+        if (this.v_upcomings.length > 4) {
+          alert("Please complete the upcoming task!!!");
+        } else {
+          const constNewTask = {
+            title: this.v_newtask,
+            waiting: true,
+            taskId: Math.random().toString(36).substring(7),
+          };
+          fetch("/api/upcoming", {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(constNewTask),
+          }).then(() => this.v_upcomings.push(constNewTask));
+          this.v_newtask = "";
+        }
+      }
+    },
+    //U-3
+    onDelUpcoming(arg_task) {
+      if (confirm("Are you sure to delete this task?: " + arg_task.title)) {
+        this.onDelSubFunc(arg_task.taskId, "upcoming");
+      }
+    },
+
+    // ~~~~~ daily
+    //D-1
+    onFetchDailyTasks() {
+      this.onFetchSubFunc("dailytask");
+    },
+    //D-2
+    onAddDailyTask(arg_task_id) {
+      const task_tmp = this.v_upcomings.filter(
+        ({ taskId: id }) => id === arg_task_id
+      )[0];
+      fetch("/api/dailytask", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(task_tmp),
+      }).then(() => this.v_dailytasks.unshift(task_tmp));
+    },
+    //D-3
+    onDeleteDailyTask(arg_task) {
+      if (confirm("Are you sure to delete this task?: " + arg_task.title)) {
+        this.onDelSubFunc(arg_task.taskId, "dailytask");
+      }
+    },
+    onUpdateDailyTask(arg_task_id) {},
+
+    // ~~~~~ sub function
+    onFetchSubFunc(arg_uri_name) {
+      fetch("/api/" + arg_uri_name)
+        .then((res) => res.json())
+        .then(({ data }) => {
+          if (arg_uri_name === "upcoming") {
+            this.v_upcomings = data;
+          } else {
+            this.v_dailytasks = data;
+          }
         })
-          .then((res) => res.json())
-          .then(() => {
+        .catch((err) => alert("SEL " + arg_uri_name + " tasks ERR!!! " + err));
+    },
+    onDelSubFunc(arg_task_id, arg_uri_name) {
+      fetch(`/api/${arg_uri_name}/${arg_task_id}`, {
+        method: "DELETE",
+      })
+        .then(() => {
+          if (arg_uri_name === "upcoming") {
             this.v_upcomings = this.v_upcomings.filter(
               ({ taskId: id }) => id !== arg_task_id
             );
-          })
-          .catch((err) => alert("DEL upcoming tasks ERR!!! " + err));
-      }
+          } else {
+            this.v_dailytasks = this.v_dailytasks.filter(
+              ({ taskId: id }) => id !== arg_task_id
+            );
+          }
+        })
+        .catch((err) => alert("DEL " + arg_uri_name + " task ERR!!! " + err));
     },
   },
 };
