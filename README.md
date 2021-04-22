@@ -1,9 +1,10 @@
 # docker-laravel 🐳
 
-![License](https://img.shields.io/github/license/ucan-lab/docker-laravel?color=f05340)
-![Stars](https://img.shields.io/github/stars/ucan-lab/docker-laravel?color=f05340)
-![Issues](https://img.shields.io/github/issues/ucan-lab/docker-laravel?color=f05340)
-![Forks](https://img.shields.io/github/forks/ucan-lab/docker-laravel?color=f05340)
+![License](https://img.shields.io/github/license/tquangdo/vue2-laravel8-crud-crm-app?color=f05340)
+![Stars](https://img.shields.io/github/stars/tquangdo/vue2-laravel8-crud-crm-app?color=f05340)
+![Issues](https://img.shields.io/github/issues/tquangdo/vue2-laravel8-crud-crm-app?color=f05340)
+![Forks](https://img.shields.io/github/forks/tquangdo/vue2-laravel8-crud-crm-app?color=f05340)
+[![Report an issue](https://img.shields.io/badge/Support-Issues-green)](https://github.com/tquangdo/vue2-laravel8-crud-crm-app/issues/new)
 
 ## Introduction
 
