@@ -26,8 +26,8 @@
                 <input
                   type="checkbox"
                   name="test"
-                  :checked="item_task.done"
-                  @change="onUpdateDailyTask(item_task.taskId)"
+                  :checked="item_task.approved"
+                  @change="onUpdateDailyTask(item_task)"
                 />
                 <span></span>
               </label>
@@ -73,7 +73,7 @@
                 <input
                   type="checkbox"
                   name="test"
-                  :checked="item_upcoming_task.done"
+                  :checked="item_upcoming_task.approved"
                   @change="onCheckUpcoming(item_upcoming_task.taskId)"
                 />
                 <span></span>
@@ -125,6 +125,7 @@ export default {
       } else {
         this.onAddDailyTask(arg_task_id);
         this.onDelSubFunc(arg_task_id, "upcoming");
+        this.onFetchUpcoming();
       }
     },
     //U-1
@@ -187,7 +188,20 @@ export default {
         this.onDelSubFunc(arg_task.taskId, "dailytask");
       }
     },
-    onUpdateDailyTask(arg_task_id) {},
+    //D-4
+    onUpdateDailyTask(arg_task) {
+      fetch(`/api/dailytask/${arg_task.taskId}`, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(arg_task),
+      })
+        .then(() => {
+          this.onFetchDailyTasks();
+        })
+        .catch((err) => alert("UPD daily task ERR!!! " + err));
+    },
 
     // ~~~~~ sub function
     onFetchSubFunc(arg_uri_name) {

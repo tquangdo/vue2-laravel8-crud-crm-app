@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Today extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'done', 'approved', 'taskId'];
+    protected $fillable = ['title', 'done', 'approved', 'taskId']; // 'done' KO xai!!!
 }

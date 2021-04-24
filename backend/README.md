@@ -6,13 +6,13 @@
 - `[app] $ composer require laravel/ui`
 - `[app] $ php artisan ui vue`
 - `cd backend`
-- `backend % npm install && npm run watch`
+- `backend % npm install && npm run watch` (MUST)
 
 ## Laravel
 
 1. By Docker
 - `docker-compose up -d`
-- in browser accesss to "localhost"
+- in browser accesss to "localhost" (MUST)
 2. By Laravel artisan
 - `backend % php artisan serve`
 - in browser accesss to "localhost:8000"
@@ -24,6 +24,8 @@
 ### connect by tool (MySQLWorkbench)
 - `user: root & pw: secret`
 ### migration
+ (MUST)
+- `docker-compose exec app bash`
 - `php artisan migrate`
 
 ## MVC

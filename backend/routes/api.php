@@ -41,6 +41,8 @@ Route::delete("/upcoming/{taskId}", function ($taskId) {
 });
 //D-1
 Route::get("/dailytask", function () {
+    // sortBy() KO dung duoc voi "TodayTaskResource extends JsonResource", dung OK voi "Illuminate\Support\Collection"
+    // return TodayTaskResource::collection(Today::all())->sortBy('id')->values()->all();
     return TodayTaskResource::collection(Today::all());
 });
 //D-2
@@ -55,4 +57,10 @@ Route::post("/dailytask", function (Request $req) {
 Route::delete("/dailytask/{taskId}", function ($taskId) {
     DB::table('todays')->where('taskId', $taskId)->delete();
     return 204;
+});
+//D-4
+Route::put("/dailytask/{taskId}", function (Request $req) {
+    $aprrove_upd_res = ($req->approved == 1) ? 0 : 1;
+    DB::table('todays')->where('taskId', $req->taskId)->update(['approved' => $aprrove_upd_res]);
+    return 203;
 });

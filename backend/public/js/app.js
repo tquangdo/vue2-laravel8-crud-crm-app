@@ -2106,6 +2106,7 @@ __webpack_require__.r(__webpack_exports__);
       } else {
         this.onAddDailyTask(arg_task_id);
         this.onDelSubFunc(arg_task_id, "upcoming");
+        this.onFetchUpcoming();
       }
     },
     //U-1
@@ -2177,10 +2178,25 @@ __webpack_require__.r(__webpack_exports__);
         this.onDelSubFunc(arg_task.taskId, "dailytask");
       }
     },
-    onUpdateDailyTask: function onUpdateDailyTask(arg_task_id) {},
+    //D-4
+    onUpdateDailyTask: function onUpdateDailyTask(arg_task) {
+      var _this3 = this;
+
+      fetch("/api/dailytask/".concat(arg_task.taskId), {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify(arg_task)
+      }).then(function () {
+        _this3.onFetchDailyTasks();
+      })["catch"](function (err) {
+        return alert("UPD daily task ERR!!! " + err);
+      });
+    },
     // ~~~~~ sub function
     onFetchSubFunc: function onFetchSubFunc(arg_uri_name) {
-      var _this3 = this;
+      var _this4 = this;
 
       fetch("/api/" + arg_uri_name).then(function (res) {
         return res.json();
@@ -2188,27 +2204,27 @@ __webpack_require__.r(__webpack_exports__);
         var data = _ref2.data;
 
         if (arg_uri_name === "upcoming") {
-          _this3.v_upcomings = data;
+          _this4.v_upcomings = data;
         } else {
-          _this3.v_dailytasks = data;
+          _this4.v_dailytasks = data;
         }
       })["catch"](function (err) {
         return alert("SEL " + arg_uri_name + " tasks ERR!!! " + err);
       });
     },
     onDelSubFunc: function onDelSubFunc(arg_task_id, arg_uri_name) {
-      var _this4 = this;
+      var _this5 = this;
 
       fetch("/api/".concat(arg_uri_name, "/").concat(arg_task_id), {
         method: "DELETE"
       }).then(function () {
         if (arg_uri_name === "upcoming") {
-          _this4.v_upcomings = _this4.v_upcomings.filter(function (_ref3) {
+          _this5.v_upcomings = _this5.v_upcomings.filter(function (_ref3) {
             var id = _ref3.taskId;
             return id !== arg_task_id;
           });
         } else {
-          _this4.v_dailytasks = _this4.v_dailytasks.filter(function (_ref4) {
+          _this5.v_dailytasks = _this5.v_dailytasks.filter(function (_ref4) {
             var id = _ref4.taskId;
             return id !== arg_task_id;
           });
@@ -38182,10 +38198,10 @@ var render = function() {
                 _c("label", { staticClass: "myCheckbox" }, [
                   _c("input", {
                     attrs: { type: "checkbox", name: "test" },
-                    domProps: { checked: item_task.done },
+                    domProps: { checked: item_task.approved },
                     on: {
                       change: function($event) {
-                        return _vm.onUpdateDailyTask(item_task.taskId)
+                        return _vm.onUpdateDailyTask(item_task)
                       }
                     }
                   }),
@@ -38283,7 +38299,7 @@ var render = function() {
                 _c("label", { staticClass: "myCheckbox" }, [
                   _c("input", {
                     attrs: { type: "checkbox", name: "test" },
-                    domProps: { checked: item_upcoming_task.done },
+                    domProps: { checked: item_upcoming_task.approved },
                     on: {
                       change: function($event) {
                         return _vm.onCheckUpcoming(item_upcoming_task.taskId)
