@@ -1,7 +1,6 @@
 # docker-laravel 🐳
 ![demo](demo.png)
 
-![License](https://img.shields.io/github/license/tquangdo/vue2-laravel8-crud-crm-app?color=f05340)
 ![Stars](https://img.shields.io/github/stars/tquangdo/vue2-laravel8-crud-crm-app?color=f05340)
 ![Issues](https://img.shields.io/github/issues/tquangdo/vue2-laravel8-crud-crm-app?color=f05340)
 ![Forks](https://img.shields.io/github/forks/tquangdo/vue2-laravel8-crud-crm-app?color=f05340)
